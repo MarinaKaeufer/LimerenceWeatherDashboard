@@ -32,12 +32,14 @@ var buttonClickHandler = function (event) {
 var getCityWeathers = function (city) {
 
   //ajax here
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=miami&appid=2a312f7d725b85142a0017e3fca4c028&units=metric`;
+  const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&exclude=daily&appid=2a312f7d725b85142a0017e3fca4c028`;
 
   fetch(url)
     .then(response => response.json())
     .then(data => {
-        console.log(`==> data ${JSON.stringify(data,null,2)}`);
+        console.log(`==> data.list ${JSON.stringify(data.list,null,2)}`);
+        console.log(`==> city ${JSON.stringify(city,null,2)}`);
+        displayWeathers(data.list, city);
 
     })
 
@@ -76,33 +78,34 @@ var getFeaturedWeathers = function (history) {
 
 var displayWeathers = function (weathers, searchTerm) {
   if (weathers.length === 0) {
-    weatherContainerEl.textContent = 'No weathersitories found.';
+    weatherContainerEl.textContent = 'No weather data found.';
     return;
   }
+  const date = new Date();
 
-  weatherSearchTerm.textContent = searchTerm;
+  weatherSearchTerm.textContent = searchTerm + " " + "(" + date.toLocaleDateString('en-US') + ")";
 
   for (var i = 0; i < weathers.length; i++) {
-    var weatherName = weathers[i].owner.login + '/' + weathers[i].name;
+    // var weatherName = weathers[i].owner.login + '/' + weathers[i].name;
 
     var weatherEl = document.createElement('a');
     weatherEl.classList = 'list-item flex-row justify-space-between align-center';
-    weatherEl.setAttribute('href', './single-weather.html?weather=' + weatherName);
+    // weatherEl.setAttribute('href', './single-weather.html?weather=' + weatherName);
 
     var titleEl = document.createElement('span');
-    titleEl.textContent = weatherName;
+    // titleEl.textContent = weatherName;
 
     weatherEl.appendChild(titleEl);
 
     var statusEl = document.createElement('span');
     statusEl.classList = 'flex-row align-center';
 
-    if (weathers[i].open_issues_count > 0) {
-      statusEl.innerHTML =
-        "<i class='fas fa-times status-icon icon-danger'></i>" + weathers[i].open_issues_count + ' issue(s)';
-    } else {
-      statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
-    }
+    // if (weathers[i].open_issues_count > 0) {
+    //   statusEl.innerHTML =
+    //     "<i class='fas fa-times status-icon icon-danger'></i>" + weathers[i].open_issues_count + ' issue(s)';
+    // } else {
+    //   statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
+    // }
 
     weatherEl.appendChild(statusEl);
 
