@@ -4,7 +4,7 @@ var nameInputEl = document.querySelector('#city');
 var weatherContainerEl = document.querySelector('#weathers-container');
 var todaysWeatherContainerEl = document.querySelector('#todays-weathers-container');
 var weatherSearchTerm = document.querySelector('#weather-search-term');
-var weatherHistory = [];
+var weatherHistory;
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
@@ -14,6 +14,7 @@ var formSubmitHandler = function (event) {
   if (city) {
     addToHistory(city);
     getCityWeathers(city);
+    updateHistoryUI();
 
     weatherContainerEl.textContent = '';
     nameInputEl.value = '';
@@ -22,7 +23,19 @@ var formSubmitHandler = function (event) {
   }
 };
 
+var updateHistoryUI = function(){
+    weatherHistory = JSON.parse(localStorage.getItem("history")) || [];
+    historyButtonsEl.innerHTML = '';
+    weatherHistory.forEach(city => {
+        var historyEl = document.createElement('button');
+        historyEl.classList = 'btn';
+        historyEl.textContent = city;
+        historyButtonsEl.appendChild(historyEl);
+    })
+}
+
 var addToHistory = function (city) {
+    if (weatherHistory.includes(city)) return;
     weatherHistory.push(city);
     localStorage.setItem("history", JSON.stringify(weatherHistory));
 }
@@ -80,15 +93,15 @@ var displayWeathers = function (weathers, searchTerm) {
   let wind = weathers[0]['wind']['speed'];
   let humidity = weathers[0]['main']['humidity'];
 
+  todaysWeatherContainerEl.innerHTML = '';
+
   var weatherEl = document.createElement('div');
     weatherEl.classList = 'list-item flex-row justify-space-between align-center';
-    // weatherEl.setAttribute('href', './single-weather.html?weather=' + weatherName);
 
     var titleEl = document.createElement('span');
-    // date = currentDay;
     titleEl.textContent = newDate.toLocaleDateString('en-US');
-    // titleEl.textContent = date.toLocaleDateString('en-US');
-
+    
+    // Clear all children first 
     weatherEl.appendChild(titleEl);
 
     var tempEl = document.createElement('span');
@@ -123,15 +136,6 @@ var displayWeathers = function (weathers, searchTerm) {
     temp = weathers[i]['main']['temp'];
     wind = weathers[i]['wind']['speed'];
     humidity = weathers[i]['main']['humidity'];
-    
-
-    // console.log(` `)
-    // console.log(`==> currentDate ${currentDate}`)
-    // console.log(`==> temp ${temp}`)
-    // console.log(`==> wind ${wind}`)
-    // console.log(`==> humidity ${humidity}`)
-
-    
 
     var weatherEl = document.createElement('div');
     weatherEl.classList = 'list-item flex-row justify-space-between align-center';
@@ -167,3 +171,5 @@ var displayWeathers = function (weathers, searchTerm) {
 
 userFormEl.addEventListener('submit', formSubmitHandler);
 historyButtonsEl.addEventListener('click', buttonClickHandler);
+
+updateHistoryUI();
