@@ -28,6 +28,9 @@ var updateHistoryUI = function(){
     historyButtonsEl.innerHTML = '';
     weatherHistory.forEach(city => {
         var historyEl = document.createElement('button');
+        historyEl.addEventListener("click", function(event){
+            getCityWeathers(event.currentTarget.innerHTML);
+          });
         historyEl.classList = 'btn';
         historyEl.textContent = city;
         historyButtonsEl.appendChild(historyEl);
@@ -40,16 +43,6 @@ var addToHistory = function (city) {
     localStorage.setItem("history", JSON.stringify(weatherHistory));
 }
 
-var buttonClickHandler = function (event) {
-  var history = event.target.getAttribute('data-history');
-
-  if (history) {
-    getFeaturedWeathers(history);
-
-    weatherContainerEl.textContent = '';
-  }
-};
-
 var getCityWeathers = function (city) {
 
   //ajax here
@@ -61,20 +54,6 @@ var getCityWeathers = function (city) {
         displayWeathers(data.list, city);
 
     })
-};
-
-var getFeaturedWeathers = function (history) {
-  var apiUrl = 'https://api.github.com/search/weathersitories?q=' + history + '+is:featured&sort=help-wanted-issues';
-
-  fetch(apiUrl).then(function (response) {
-    if (response.ok) {
-      response.json().then(function (data) {
-        displayWeathers(data.items, history);
-      });
-    } else {
-      alert('Error: ' + response.statusText);
-    }
-  });
 };
 
 var displayWeathers = function (weathers, searchTerm) {
@@ -126,6 +105,7 @@ var displayWeathers = function (weathers, searchTerm) {
     // =========================== END TODAY ===========================
 
   //   5 Day forecast
+  weatherContainerEl.textContent = '';
   for (var i = 0; i < weathers.length; i++) {
     let currentDate = new Date(weathers[i]['dt'] * 1000);
     currentDate.setHours(0,0,0,0)
@@ -170,6 +150,5 @@ var displayWeathers = function (weathers, searchTerm) {
 };
 
 userFormEl.addEventListener('submit', formSubmitHandler);
-historyButtonsEl.addEventListener('click', buttonClickHandler);
 
 updateHistoryUI();
