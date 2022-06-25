@@ -37,8 +37,8 @@ var getCityWeathers = function (city) {
   fetch(url)
     .then(response => response.json())
     .then(data => {
-        console.log(`==> data.list ${JSON.stringify(data.list,null,2)}`);
-        console.log(`==> city ${JSON.stringify(city,null,2)}`);
+        // console.log(`==> data.list ${JSON.stringify(data.list,null,2)}`);
+        // console.log(`==> city ${JSON.stringify(city,null,2)}`);
         displayWeathers(data.list, city);
 
     })
@@ -81,31 +81,29 @@ var displayWeathers = function (weathers, searchTerm) {
     weatherContainerEl.textContent = 'No weather data found.';
     return;
   }
-  let date = new Date();
-  var month = date.getUTCMonth() + 1; //months from 1-12
-  var day = date.getUTCDate();
-  var year = date.getUTCFullYear();
-  let currentDay = year + "-" + month + "-" + "day";
-  weatherSearchTerm.textContent = searchTerm + " " + "(" + date.toLocaleDateString('en-US') + ")";
-
-  //   Single day forecast
   
+  const today = new Date();
+  weatherSearchTerm.textContent = searchTerm + " " + "(" + today.toLocaleDateString('en-US') + ")";
+  let newDate = today;
+  newDate.setHours(0,0,0,0)
+
   //   5 Day forecast
   for (var i = 0; i < weathers.length; i++) {
-    if(currentDay === weathers[i]['dt_txt'].split(' ')[0]) break;
-    currentDay = weathers[i]['dt_txt'].split(' ')[0];
-    // main --> temp, humudity 
-    // wind --> speed
-    const weatherDate = weathers[i]['dt']
+    let currentDate = new Date(weathers[i]['dt'] * 1000);
+    currentDate.setHours(0,0,0,0)
+
+    if(newDate.getDate() == currentDate.getDate()) continue;
+    newDate = currentDate;
+
     const temp = weathers[i]['main']['temp'];
     const wind = weathers[i]['wind']['speed'];
     const humidity = weathers[i]['main']['humidity'];
 
-    console.log(` `)
-    console.log(`==> currentDay ${currentDay}`)
-    console.log(`==> temp ${temp}`)
-    console.log(`==> wind ${wind}`)
-    console.log(`==> humidity ${humidity}`)
+    // console.log(` `)
+    // console.log(`==> currentDate ${currentDate}`)
+    // console.log(`==> temp ${temp}`)
+    // console.log(`==> wind ${wind}`)
+    // console.log(`==> humidity ${humidity}`)
 
     // var weatherName = weathers[i].owner.login + '/' + weathers[i].name;
 
@@ -115,23 +113,27 @@ var displayWeathers = function (weathers, searchTerm) {
 
     var titleEl = document.createElement('span');
     // date = currentDay;
-    titleEl.textContent = currentDay;
+    titleEl.textContent = currentDate.toLocaleDateString('en-US');
     // titleEl.textContent = date.toLocaleDateString('en-US');
 
     weatherEl.appendChild(titleEl);
 
-    var statusEl = document.createElement('span');
-    statusEl.classList = 'flex-row align-center';
-    statusEl.textContent = temp;
+    var tempEl = document.createElement('span');
+    tempEl.classList = 'flex-row align-center';
+    tempEl.textContent = temp;
 
-    // if (weathers[i].open_issues_count > 0) {
-    //   statusEl.innerHTML =
-    //     "<i class='fas fa-times status-icon icon-danger'></i>" + weathers[i].open_issues_count + ' issue(s)';
-    // } else {
-    //   statusEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
-    // }
+    var windEl = document.createElement('span');
+    windEl.classList = 'flex-row align-center';
+    windEl.textContent = wind;
 
-    weatherEl.appendChild(statusEl);
+    var humidEl = document.createElement('span');
+    humidEl.classList = 'flex-row align-center';
+    humidEl.textContent = humidity;
+
+
+    weatherEl.appendChild(tempEl);
+    weatherEl.appendChild(windEl);
+    weatherEl.appendChild(humidEl);
 
     weatherContainerEl.appendChild(weatherEl);
   }
