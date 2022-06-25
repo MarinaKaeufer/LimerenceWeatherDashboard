@@ -4,7 +4,7 @@ var nameInputEl = document.querySelector('#city');
 var weatherContainerEl = document.querySelector('#weathers-container');
 var todaysWeatherContainerEl = document.querySelector('#todays-weathers-container');
 var weatherSearchTerm = document.querySelector('#weather-search-term');
-
+var weatherHistory = [];
 
 var formSubmitHandler = function (event) {
   event.preventDefault();
@@ -12,6 +12,7 @@ var formSubmitHandler = function (event) {
   var city = nameInputEl.value.trim();
 
   if (city) {
+    addToHistory(city);
     getCityWeathers(city);
 
     weatherContainerEl.textContent = '';
@@ -20,6 +21,11 @@ var formSubmitHandler = function (event) {
     alert('Please enter a Limerence city');
   }
 };
+
+var addToHistory = function (city) {
+    weatherHistory.push(city);
+    localStorage.setItem("history", JSON.stringify(weatherHistory));
+}
 
 var buttonClickHandler = function (event) {
   var history = event.target.getAttribute('data-history');
