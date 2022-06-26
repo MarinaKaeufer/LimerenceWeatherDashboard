@@ -1,8 +1,8 @@
 var userFormEl = document.querySelector('#user-form');
 var historyButtonsEl = document.querySelector('#history-buttons');
 var nameInputEl = document.querySelector('#city');
-var weatherContainerEl = document.querySelector('#weathers-container');
-var todaysWeatherContainerEl = document.querySelector('#todays-weathers-container');
+var weatherContainerEl = document.querySelector('#weather-container');
+var todaysWeatherContainerEl = document.querySelector('#todays-weather-container');
 var weatherSearchTerm = document.querySelector('#weather-search-term');
 var weatherHistory;
 
@@ -13,7 +13,7 @@ var formSubmitHandler = function (event) {
 
   if (city) {
     addToHistory(city);
-    getCityWeathers(city);
+    getCityWeather(city);
     updateHistoryUI();
 
     weatherContainerEl.textContent = '';
@@ -29,7 +29,7 @@ var updateHistoryUI = function(){
     weatherHistory.forEach(city => {
         var historyEl = document.createElement('button');
         historyEl.addEventListener("click", function(event){
-            getCityWeathers(event.currentTarget.innerHTML);
+            getCityWeather(event.currentTarget.innerHTML);
           });
         historyEl.classList = 'btn';
         historyEl.textContent = city;
@@ -43,7 +43,7 @@ var addToHistory = function (city) {
     localStorage.setItem("history", JSON.stringify(weatherHistory));
 }
 
-var getCityWeathers = function (city) {
+var getCityWeather = function (city) {
 
   //ajax here
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=2a312f7d725b85142a0017e3fca4c028`;
@@ -51,13 +51,13 @@ var getCityWeathers = function (city) {
   fetch(url)
     .then(response => response.json())
     .then(data => {
-        displayWeathers(data.list, city);
+        displayWeather(data.list, city);
 
     })
 };
 
-var displayWeathers = function (weathers, searchTerm) {
-  if (weathers.length === 0) {
+var displayWeather = function (weather, searchTerm) {
+  if (weather.length === 0) {
     weatherContainerEl.textContent = 'No weather data found.';
     return;
   }
@@ -68,9 +68,9 @@ var displayWeathers = function (weathers, searchTerm) {
   newDate.setHours(0,0,0,0)
 
   //   Today's forecast
-  let temp = weathers[0]['main']['temp'];
-  let wind = weathers[0]['wind']['speed'];
-  let humidity = weathers[0]['main']['humidity'];
+  let temp = weather[0]['main']['temp'];
+  let wind = weather[0]['wind']['speed'];
+  let humidity = weather[0]['main']['humidity'];
 
   todaysWeatherContainerEl.innerHTML = '';
 
@@ -106,16 +106,16 @@ var displayWeathers = function (weathers, searchTerm) {
 
   //   5 Day forecast
   weatherContainerEl.textContent = '';
-  for (var i = 0; i < weathers.length; i++) {
-    let currentDate = new Date(weathers[i]['dt'] * 1000);
+  for (var i = 0; i < weather.length; i++) {
+    let currentDate = new Date(weather[i]['dt'] * 1000);
     currentDate.setHours(0,0,0,0)
 
     if(newDate.getDate() == currentDate.getDate()) continue;
     newDate = currentDate;
 
-    temp = weathers[i]['main']['temp'];
-    wind = weathers[i]['wind']['speed'];
-    humidity = weathers[i]['main']['humidity'];
+    temp = weather[i]['main']['temp'];
+    wind = weather[i]['wind']['speed'];
+    humidity = weather[i]['main']['humidity'];
 
     var weatherEl = document.createElement('div');
     weatherEl.classList = 'list-item flex-row justify-space-between align-center';
